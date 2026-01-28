@@ -8,7 +8,7 @@ on:
 
 jobs:
   quality-check:
-    uses: https://github.com/RAM-Rogue-AI-Model/ram-infra/.github/workflows/reusable-sonar.yml@main
+    uses: RAM-Rogue-AI-Model/ram-infra/.github/workflows/reusable-sonar.yml@main
     with:
       project_key: ram-api-gateway
     secrets:
