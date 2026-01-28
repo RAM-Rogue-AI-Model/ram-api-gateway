@@ -1,0 +1,15 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  quality-check:
+    uses: https://github.com/RAM-Rogue-AI-Model/ram-infra/.github/workflows/reusable-sonar.yml@main
+    with:
+      project_key: ram-api-gateway
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
