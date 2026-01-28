@@ -11,4 +11,6 @@ jobs:
     uses: RAM-Rogue-AI-Model/ram-infra/.github/workflows/reusable-sonar.yml@main
     with:
       project_key: ram-api-gateway
+      sources: "."
+      tests: "."
     secrets: inherit
