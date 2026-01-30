@@ -10,6 +10,8 @@ import { config } from './utils/config';
 const app = express();
 const port = config.PORT || 3001;
 
+app.use(express.json());
+
 app.use(
   cors({
     origin: [config.CLIENT_URL],

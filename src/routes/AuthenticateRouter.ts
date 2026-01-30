@@ -10,7 +10,7 @@ class AuthenticateRouter {
 
     this.router
       .route('/register')
-      .get(requestDetails, async (req: Request, res: Response) => {
+      .post(requestDetails, async (req: Request, res: Response) => {
         await authenticateController.register(req, res);
       });
 

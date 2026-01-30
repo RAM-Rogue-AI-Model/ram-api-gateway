@@ -20,9 +20,8 @@ class AuthenticateController {
       )) as UserType;
       res.json(data);
       return;
-    } catch (err) {
-      console.error(err);
-      res.status(500).send({ message: 'Internal server error' });
+    } catch {
+      res.sendStatus(500);
       return;
     }
   }
