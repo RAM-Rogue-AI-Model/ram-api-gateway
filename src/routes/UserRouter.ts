@@ -1,16 +1,16 @@
-import express, { Request, Response, Router } from "express"
-import { UserController } from "../controllers/UserController"
+import express, { Request, Response, Router } from 'express';
 
-class UserRouter{
-    public router : Router
-    constructor(userController : UserController){
-        this.router = express.Router();
+import { UserController } from '../controllers/UserController';
 
-        this.router.route('/')
-            .get(async (req:Request, res:Response) => {
-                res.sendStatus(200)
-            });
-    }
+class UserRouter {
+  public router: Router;
+  constructor(_userController: UserController) {
+    this.router = express.Router();
+
+    this.router.route('/').get((_req: Request, res: Response) => {
+      res.sendStatus(200);
+    });
+  }
 }
 
-export { UserRouter }
+export { UserRouter };
