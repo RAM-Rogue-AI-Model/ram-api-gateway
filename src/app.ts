@@ -23,7 +23,7 @@ const authenticateController = new AuthenticateController();
 const userController = new UserController();
 
 app.use('/api', new AuthenticateRouter(authenticateController).router);
-app.use('/api/users', new UserRouter(userController).router);
+app.use('/api/user', new UserRouter(userController).router);
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console

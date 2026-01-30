@@ -1,7 +1,11 @@
-interface RegisterUserBody {
+export interface RegisterUserBody {
   username: string;
   password: string;
-  confirmPassword: string;
+  confirmPassword?: string;
 }
 
-export { RegisterUserBody };
+export interface AuthenticatedUser {
+  username: string;
+  id: string;
+  isAdmin: boolean;
+}

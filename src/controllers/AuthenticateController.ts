@@ -25,6 +25,21 @@ class AuthenticateController {
       return;
     }
   }
+
+  async login(req: Request, res: Response) {
+    try {
+      const body = req.body as Partial<RegisterUserBody>;
+      const data = (await this.request.post(
+        '/user/login',
+        JSON.stringify(body)
+      )) as UserType;
+      res.json(data);
+      return;
+    } catch {
+      res.sendStatus(500);
+      return;
+    }
+  }
 }
 
 export { AuthenticateController };
