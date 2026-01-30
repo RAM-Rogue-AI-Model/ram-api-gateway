@@ -21,8 +21,7 @@ class Requests {
           return data;
         } else return response;
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       throw new Error('Network response was not ok');
     }
   }
@@ -41,8 +40,8 @@ class Requests {
       );
 
       return responseData;
-    } catch (err) {
-      return err;
+    } catch {
+      throw new Error('Network response was not ok');
     }
   }
 
@@ -58,8 +57,7 @@ class Requests {
       });
 
       return responseData;
-    } catch (err) {
-      console.error(err);
+    } catch {
       throw new Error('Network response was not ok');
     }
   }
@@ -76,8 +74,7 @@ class Requests {
       });
 
       return responseData;
-    } catch (err) {
-      console.error(err);
+    } catch {
       throw new Error('Network response was not ok');
     }
   }
@@ -96,8 +93,7 @@ class Requests {
       );
 
       return responseData;
-    } catch (err) {
-      console.error(err);
+    } catch {
       throw new Error('Network response was not ok');
     }
   }

@@ -20,7 +20,11 @@ const authenticateJWT = (
         return;
       }
 
-      req.user = user.id as string;
+      req.user = {
+        id: user.id as string,
+        username: user.username as string,
+        isAdmin: user.isAdmin as boolean,
+      };
       next();
     });
   } else {
