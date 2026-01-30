@@ -2,8 +2,10 @@ import cors from 'cors';
 import express from 'express';
 
 import { AuthenticateController } from './controllers/AuthenticateController';
+import { PlayerController } from './controllers/PlayerController';
 import { UserController } from './controllers/UserController';
 import { AuthenticateRouter } from './routes/AuthenticateRouter';
+import { PlayerRouter } from './routes/PlayerRouter';
 import { UserRouter } from './routes/UserRouter';
 import { config } from './utils/config';
 
@@ -21,9 +23,11 @@ app.use(
 
 const authenticateController = new AuthenticateController();
 const userController = new UserController();
+const playerController = new PlayerController();
 
 app.use('/api', new AuthenticateRouter(authenticateController).router);
 app.use('/api/user', new UserRouter(userController).router);
+app.use('/api/player' , new PlayerRouter(playerController).router);
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console
