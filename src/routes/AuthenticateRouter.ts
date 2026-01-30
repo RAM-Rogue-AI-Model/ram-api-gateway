@@ -14,9 +14,11 @@ class AuthenticateRouter {
         await authenticateController.register(req, res);
       });
 
-    this.router.route('/login').post((req: Request, res: Response) => {
-      res.sendStatus(200);
-    });
+    this.router
+      .route('/login')
+      .post(requestDetails, async (req: Request, res: Response) => {
+        await authenticateController.login(req, res);
+      });
   }
 }
 
