@@ -30,7 +30,7 @@ class PlayerController {
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: RequestWithUser, res: Response) {
     try {
       const id: string = req.params.id as string;
       await this.request.delete('/player/' + id);
@@ -42,10 +42,10 @@ class PlayerController {
     }
   }
 
-  async findOne(req: Request, res: Response) {
+  async findOne(req: RequestWithUser, res: Response) {
     try {
       const id: string = req.params.id as string;
-      const userId: string = req.query.userId as string;
+      const userId: string | undefined = req.user?.id ?? undefined
 
       if (!userId || !id) {
         res.sendStatus(400);
@@ -61,11 +61,11 @@ class PlayerController {
     }
   }
 
-  async findAll(req: Request, res: Response) {
+  async findAll(req: RequestWithUser, res: Response) {
     try {
-      const userId: string | undefined = req.query.userId as string | undefined;
+      const userId: string | undefined = req.user?.id ?? undefined
 
-      const data = await this.request.delete(`/player?user_id=${userId}`);
+      const data = await this.request.get(`/player?user_id=${userId}`);
       res.json(data);
       return;
     } catch {
@@ -74,7 +74,7 @@ class PlayerController {
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: RequestWithUser, res: Response) {
     try {
       const id = req.params.id as string;
       const data = await this.request.put(

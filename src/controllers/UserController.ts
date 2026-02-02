@@ -65,10 +65,10 @@ class UserController {
       const id = req.params.id as string;
       const body = req.body as UpdateUserBody;
 
-      await this.request.patch(`user/${id}/password`, JSON.stringify(body));
-      res.sendStatus(200);
+      const data = await this.request.patch(`/user/${id}/password`, JSON.stringify(body));
+      res.json(data);
       return;
-    } catch {
+    } catch (err) {
       res.sendStatus(500);
       return;
     }
@@ -80,7 +80,7 @@ class UserController {
       const body = req.body as UpdateUserBody;
 
       const data = await this.request.patch(
-        `user/${id}/rename`,
+        `/user/${id}/rename`,
         JSON.stringify(body)
       );
       res.json(data);
