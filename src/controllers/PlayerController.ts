@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
 
-import { RegisterUserBody } from '../types/AuthenticateType';
 import { CreatePlayerType, PlayerType } from '../types/Player';
-import { UserType } from '../types/User';
+import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
-import { RequestWithUser } from '../types/Request';
 
 class PlayerController {
   request;
@@ -35,9 +33,7 @@ class PlayerController {
   async delete(req: Request, res: Response) {
     try {
       const id: string = req.params.id as string;
-      const data = (await this.request.delete(
-        '/player/' + id
-      ));
+      const data = await this.request.delete('/player/' + id);
       res.json(data);
       return;
     } catch {

@@ -16,6 +16,33 @@ class UserRouter {
         authenticateJWT,
         (req: RequestWithUser, res: Response) => res.json(req.user)
       );
+
+    this.router
+      .route('/:id/rename')
+      .patch(
+        requestDetails,
+        authenticateJWT,
+        (req: RequestWithUser, res: Response) =>
+          _userController.rename(req, res)
+      );
+
+    this.router
+      .route('/:id/password')
+      .patch(
+        requestDetails,
+        authenticateJWT,
+        (req: RequestWithUser, res: Response) =>
+          _userController.changePassword(req, res)
+      );
+
+    this.router
+      .route('/:id')
+      .delete(
+        requestDetails,
+        authenticateJWT,
+        (req: RequestWithUser, res: Response) =>
+          _userController.delete(req, res)
+      );
   }
 }
 

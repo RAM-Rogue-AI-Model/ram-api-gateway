@@ -27,7 +27,7 @@ const playerController = new PlayerController();
 
 app.use('/api', new AuthenticateRouter(authenticateController).router);
 app.use('/api/user', new UserRouter(userController).router);
-app.use('/api/player' , new PlayerRouter(playerController).router);
+app.use('/api/player', new PlayerRouter(playerController).router);
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console

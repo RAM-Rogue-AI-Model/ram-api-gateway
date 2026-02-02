@@ -9,6 +9,7 @@ const config: configType = {
   CLIENT_URL: process.env.CLIENT_URL ?? 'http://localhost:3000',
   MS_USER_URL: process.env.MS_USER_URL ?? 'http://localhost:3002',
   MS_PLAYER_URL: process.env.MS_PLAYER_URL ?? 'http://localhost:3008',
+  MS_GAME_URL: process.env.MS_GAME_URL ?? 'http://localhost:3005',
 
   SALT_ROUNDS: process.env.SALT_ROUNDS ? Number(process.env.SALT_ROUNDS) : 100,
   JWT_SECRET: process.env.JWT_SECRET ?? 'ram-user-secret-jwt-token',
