@@ -1,0 +1,17 @@
+services:
+  ram-api-gateway:
+    container_name: ram-api-gateway
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    networks:
+      - ram-shared-network
+    environment:
+      PLAYER_SERVICE_URL: http://ram-ms-player:3005
+      USER_SERVICE_URL: http://ram-ms-user:3009
+
+networks:
+  ram-shared-network:
+    external: true
