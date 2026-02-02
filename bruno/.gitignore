@@ -1,0 +1,5 @@
+# Bruno temporary files
+.bruno/
+
+# Environment-specific files (if you want to keep environments private)
+# environments/

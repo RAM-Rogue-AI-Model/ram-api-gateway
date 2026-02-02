@@ -1,0 +1,34 @@
+meta {
+  name: Update Item
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/item/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Upgraded Sword of Power",
+    "type": "weapon",
+    "rarity": "legendary",
+    "price": 1500
+  }
+}
+
+docs {
+  Met à jour un item existant.
+  
+  Nécessite un token JWT valide.
+}

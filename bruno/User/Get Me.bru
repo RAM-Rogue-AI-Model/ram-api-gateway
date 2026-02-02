@@ -1,0 +1,25 @@
+meta {
+  name: Get Me
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/user/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3001
+}
+
+docs {
+  Récupère les informations de l'utilisateur actuellement connecté.
+  
+  Nécessite un token JWT valide.
+}

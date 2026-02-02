@@ -1,0 +1,33 @@
+meta {
+  name: Update Player
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/api/player/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "UpdatedPlayer",
+    "level": 5,
+    "experience": 1000
+  }
+}
+
+docs {
+  Met à jour un joueur existant.
+  
+  Nécessite un token JWT valide.
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Get Item
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/item/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  Récupère un item spécifique par son ID.
+  
+  Nécessite un token JWT valide.
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Create Player
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/player
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "PlayerOne",
+    "level": 1,
+    "experience": 0
+  }
+}
+
+docs {
+  Crée un nouveau joueur.
+  
+  Nécessite un token JWT valide.
+}

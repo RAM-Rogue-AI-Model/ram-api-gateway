@@ -1,0 +1,34 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "testuser",
+    "password": "Test123!@#"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3001
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setEnvVar("token", res.body.token);
+  }
+}
+
+docs {
+  Authentifie un utilisateur existant.
+  
+  Retourne un token JWT qui est automatiquement sauvegardé dans la variable d'environnement.
+}

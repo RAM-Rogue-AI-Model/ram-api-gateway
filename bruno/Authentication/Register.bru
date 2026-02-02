@@ -1,0 +1,28 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "testuser",
+    "password": "Test123!@#"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3001
+}
+
+docs {
+  Enregistre un nouvel utilisateur.
+  
+  Retourne un token JWT à utiliser pour les requêtes authentifiées.
+}

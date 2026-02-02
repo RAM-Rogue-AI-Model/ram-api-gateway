@@ -1,0 +1,25 @@
+meta {
+  name: Delete Player
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/player/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  Supprime un joueur.
+  
+  Nécessite un token JWT valide.
+}

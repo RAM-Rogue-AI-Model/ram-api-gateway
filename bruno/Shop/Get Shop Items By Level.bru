@@ -1,0 +1,25 @@
+meta {
+  name: Get Shop Items By Level
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/shop/:level
+  body: none
+  auth: bearer
+}
+
+params:path {
+  level: 1
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  Récupère tous les items disponibles dans le shop pour un niveau donné.
+  
+  Nécessite un token JWT valide.
+}

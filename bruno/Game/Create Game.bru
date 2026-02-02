@@ -1,0 +1,29 @@
+meta {
+  name: Create Game
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/game
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Epic Battle",
+    "maxPlayers": 4,
+    "difficulty": "hard"
+  }
+}
+
+docs {
+  Crée une nouvelle partie de jeu.
+  
+  Nécessite un token JWT valide.
+}

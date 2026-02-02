@@ -1,0 +1,25 @@
+meta {
+  name: Get Player
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/player/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  Récupère un joueur spécifique par son ID.
+  
+  Nécessite un token JWT valide.
+}

@@ -9,8 +9,13 @@ services:
     networks:
       - ram-shared-network
     environment:
-      PLAYER_SERVICE_URL: http://ram-ms-player:3005
-      USER_SERVICE_URL: http://ram-ms-user:3009
+      MS_BATTLE_URL: http://ram-ms-battle:3002
+      MS_EFFECT_URL: http://ram-ms-effect:3003
+      MS_ENEMY_URL: http://ram-ms-enemy:3004
+      MS_GAME_URL: http://ram-ms-game:3005
+      MS_ITEM_URL: http://ram-ms-item:3006
+      MS_PLAYER_URL: http://ram-ms-player:3008
+      MS_USER_URL: http://ram-ms-user:3009
 
 networks:
   ram-shared-network:

@@ -1,0 +1,21 @@
+meta {
+  name: Get All Players
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/player
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  Récupère tous les joueurs.
+  
+  Nécessite un token JWT valide.
+}

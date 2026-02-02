@@ -1,0 +1,25 @@
+meta {
+  name: Delete Item
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/item/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  Supprime un item.
+  
+  Nécessite un token JWT valide.
+}
