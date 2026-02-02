@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 
+import { UpdateUserBody } from '../types/UserType';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
 
@@ -62,8 +63,9 @@ class UserController {
   async changePassword(req: Request, res: Response) {
     try {
       const id = req.params.id as string;
+      const body = req.body as UpdateUserBody;
 
-      await this.request.get(`user/${id}/password`);
+      await this.request.patch(`user/${id}/password`, JSON.stringify(body));
       res.sendStatus(200);
       return;
     } catch {
@@ -75,8 +77,12 @@ class UserController {
   async rename(req: Request, res: Response) {
     try {
       const id = req.params.id as string;
+      const body = req.body as UpdateUserBody;
 
-      const data = await this.request.get(`user/${id}/rename`);
+      const data = await this.request.patch(
+        `user/${id}/rename`,
+        JSON.stringify(body)
+      );
       res.json(data);
       return;
     } catch {

@@ -33,9 +33,55 @@ class PlayerController {
   async delete(req: Request, res: Response) {
     try {
       const id: string = req.params.id as string;
-      const data = await this.request.delete('/player/' + id);
+      await this.request.delete('/player/' + id);
+      res.sendStatus(200);
+      return;
+    } catch {
+      res.sendStatus(500);
+      return;
+    }
+  }
+
+  async findOne(req: Request, res: Response) {
+    try {
+      const id: string = req.params.id as string;
+      const userId: string = req.query.userId as string;
+
+      if (!userId || !id) {
+        res.sendStatus(400);
+        return;
+      }
+
+      const data = await this.request.delete(`/player/${id}?user_id=${userId}`);
       res.json(data);
       return;
+    } catch {
+      res.sendStatus(500);
+      return;
+    }
+  }
+
+  async findAll(req: Request, res: Response) {
+    try {
+      const userId: string | undefined = req.query.userId as string | undefined;
+
+      const data = await this.request.delete(`/player?user_id=${userId}`);
+      res.json(data);
+      return;
+    } catch {
+      res.sendStatus(500);
+      return;
+    }
+  }
+
+  async update(req: Request, res: Response) {
+    try {
+      const id = req.params.id as string;
+      const data = await this.request.put(
+        `/player/${id}`,
+        JSON.stringify(req.body)
+      );
+      res.json(data);
     } catch {
       res.sendStatus(500);
       return;

@@ -13,12 +13,21 @@ class PlayerRouter {
       .route('/')
       .post(authenticateJWT, async (req: RequestWithUser, res: Response) => {
         await playerController.create(req, res);
+      })
+      .get(authenticateJWT, async (req: RequestWithUser, res: Response) => {
+        await playerController.findAll(req, res);
       });
 
     this.router
       .route('/:id')
-      .post(authenticateJWT, async (req: RequestWithUser, res: Response) => {
+      .delete(authenticateJWT, async (req: RequestWithUser, res: Response) => {
         await playerController.delete(req, res);
+      })
+      .put(authenticateJWT, async (req: RequestWithUser, res: Response) => {
+        await playerController.delete(req, res);
+      })
+      .get(authenticateJWT, async (req: RequestWithUser, res: Response) => {
+        await playerController.findOne(req, res);
       });
   }
 }

@@ -79,6 +79,23 @@ class Requests {
     }
   }
 
+  async patch(url: string, body: BodyInit) {
+    try {
+      const responseData = await this.request(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': this.internalSecret,
+        },
+        body: body,
+      });
+
+      return responseData;
+    } catch {
+      throw new Error('Network response was not ok');
+    }
+  }
+
   async delete(url: string) {
     try {
       const responseData = await this.request(
