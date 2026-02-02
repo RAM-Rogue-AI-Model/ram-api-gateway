@@ -1,12 +1,12 @@
 import { Response } from 'express';
 
+import { CreateBattleInput } from '../types/Battle';
+import { Enemy } from '../types/Enemy';
+import { Game } from '../types/Game';
+import { PlayerType } from '../types/Player';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
-import { Game } from '../types/Game';
-import { CreateBattleInput } from '../types/Battle';
-import { PlayerType } from '../types/Player';
-import { Enemy } from '../types/Enemy';
 
 class BattleController {
   request;
