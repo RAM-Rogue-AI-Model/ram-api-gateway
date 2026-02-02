@@ -1,0 +1,5 @@
+export enum DUNGEON {
+  DUNGEON,
+  SHOP,
+  DATACENTER
+}
