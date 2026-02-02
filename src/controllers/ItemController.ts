@@ -8,7 +8,7 @@ import { Requests } from '../utils/Request';
 class ItemController {
   request;
   constructor() {
-    this.request = new Requests(config.MS_PLAYER_URL);
+    this.request = new Requests(config.MS_ITEM_URL);
   }
 
   async create(req: RequestWithUser, res: Response) {
