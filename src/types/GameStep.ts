@@ -1,4 +1,3 @@
-import { Game } from './Game';
 import { DUNGEON } from './Dungeon';
 
 export interface GameStep {
