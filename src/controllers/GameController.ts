@@ -1,17 +1,31 @@
 import { Response } from 'express';
 
-import { CreateGameInput, DungeonType, GameType, UpdateGameInput } from '../types/Game';
+import { Battle } from '../types/Battle';
+import { DUNGEON } from '../types/Dungeon';
+import {
+  CreateGameInput,
+  DungeonType,
+  Game,
+  GameType,
+} from '../types/Game';
+import { Item } from '../types/Item';
+import { PlayerType } from '../types/Player';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
-import { PlayerType } from '../types/Player';
 
 class GameController {
   request;
-  playerRequest
+  playerRequest;
+  battleRequest;
+  itemRequest;
   constructor() {
     this.request = new Requests(config.MS_GAME_URL);
     this.playerRequest = new Requests(config.MS_PLAYER_URL);
+    this.battleRequest = new Requests(config.MS_BATTLE_URL);
+    this.itemRequest = new Requests(config.MS_ITEM_URL);
+
+
   }
 
   async create(req: RequestWithUser, res: Response) {
@@ -45,15 +59,47 @@ class GameController {
     }
   }
 
-  async deleteOne(req: RequestWithUser, res: Response) {
+  async deleteOne(req: RequestWithUser, res: Response){
     try {
       const id = req.params.id as string;
       const playerId = req.query.playerId as string;
+      const pvQuery = req.query.pv as string;
+      const attackQuery = req.query.attack as string;
+      const speedQuery = req.query.speed as string;
 
-      if (!playerId || !id) {
+      if (!playerId || !id || !pvQuery || !attackQuery || !speedQuery) {
         res.sendStatus(400);
         return;
       }
+      const pv = parseInt(pvQuery);
+      const attack = parseInt(attackQuery);
+      const speed = parseInt(speedQuery);
+      if (isNaN(pv) || isNaN(attack) || isNaN(speed)) {
+        res.sendStatus(400);
+        return;
+      }
+      const player = await this.playerRequest.get(`/player/${playerId}`) as PlayerType | null;
+      if(!player){
+        res.sendStatus(404);
+        return;
+      }
+      const game = await this.request.get(`/game/${id}?playerId=${playerId}`) as Game | null;
+      if(!game){
+        res.sendStatus(404);
+        return;
+      }
+      const gameStepLength = game.steps.length;
+      if (pv + attack + speed > gameStepLength) {
+        res.status(400).send({message:"Points exceed the number of steps in the game"});
+        return;
+      }
+
+      player.pv += pv;
+      player.attack += attack;
+      player.speed += speed;
+
+      await this.playerRequest.patch(`/player/${playerId}`, JSON.stringify(player)) as PlayerType;
+
       
       await this.request.delete(`/game/${id}?playerId=${playerId}`)
       res.status(200).send({message:"Game deleted"})
@@ -104,15 +150,55 @@ class GameController {
   async update(req:RequestWithUser, res:Response){
     try{
       const id = req.params.id as string;
-
-      if(!id){
+      const input = req.body as { player_id: string ,item_id?: string };
+      if (!id) {
         res.sendStatus(400);
-        return
+        return;
+      }
+      const game = await this.request.get(`/game/${id}?playerId=${input.player_id}`) as Game | null;
+      if(!game){
+        res.sendStatus(404);
+        return;
       }
 
-      const body = req.body as UpdateGameInput
+      const incompleteStep = game.steps.find(step => !step.completed);
+      if (!incompleteStep) {
+        res.sendStatus(404);
+        return;
+      }
+      if(incompleteStep.type === DUNGEON.DUNGEON){
+        const battle = await this.battleRequest.get(`/battle/game/${game.id}`) as Battle | null;
+        if(!battle){
+          res.sendStatus(404);
+          return;
+        }
+        if(battle.winner === 'enemy'){
+          game.ended = true;
+        }
+        await this.battleRequest.delete(`battle/${battle.id}`) as Battle;
+      }else if(incompleteStep.type === DUNGEON.SHOP){
+        const item = await this.itemRequest.get(`/item/${input.item_id}`) as Item | null;
+        if(!item){
+          res.sendStatus(404);
+          return;
+        }
+        if(game.money < item.price){
+          res.status(400).send({message:"Not enough money"});
+          return;
+        }
+        game.money -= item.price;
+        game.consumables.push(item.id);
+      }else{
+        const player = await this.playerRequest.get(`/player/${input.player_id}`) as PlayerType | null;
+        if(!player){
+          res.sendStatus(404);
+          return;
+        }
+        game.pv = Math.min(game.pv + 20, player.pv);
+      }
+      incompleteStep.completed = true;
 
-      const data = await this.request.patch(`/game/${id}`, JSON.stringify(body))
+      const data = await this.request.patch(`/game/${id}`, JSON.stringify(game))
       res.json(data)
     } catch {
       res.sendStatus(500)

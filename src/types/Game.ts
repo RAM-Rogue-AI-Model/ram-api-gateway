@@ -8,7 +8,7 @@ export interface CreateGameInput {
 export interface Game {
   id: string;
   pv: number;
-  consumables: number[]; // Inventory (Int[])
+  consumables: string[]; // Inventory (Int[])
   money: number;
   playerId: string;
   ended: boolean;
