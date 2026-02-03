@@ -79,6 +79,19 @@ class BattleController {
     }
   }
 
+  async getBattleByGameId(req: RequestWithUser, res: Response) {
+    try {
+      const gameId = req.params.id as string;
+
+      const data = await this.request.get(
+        `/battle/game/${gameId}`
+      );
+      res.json(data);
+    } catch {
+      res.sendStatus(500);
+    }
+  }
+
   async delete(req: RequestWithUser, res: Response) {
     try {
       const battleId = req.params.id as string;

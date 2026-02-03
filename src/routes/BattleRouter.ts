@@ -15,6 +15,10 @@ class BattleRouter {
         await battleController.create(req, res);
       });
 
+    this.router.route('/game/:id').get(authenticateJWT, async (req, res) => {
+      await battleController.getBattleByGameId(req, res);
+    });
+
     this.router
       .route('/:id')
       .get(authenticateJWT, async (req: RequestWithUser, res: Response) => {
