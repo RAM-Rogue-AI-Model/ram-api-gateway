@@ -86,9 +86,14 @@ class BattleController {
       const data = await this.request.get(
         `/battle/game/${gameId}`
       );
+
       res.json(data);
-    } catch {
-      res.sendStatus(500);
+    } catch (error: any) {
+      if (error?.response?.status === 404) {
+        res.json({ exist: 'none' });
+      } else {
+        res.sendStatus(500);
+      }
     }
   }
 
