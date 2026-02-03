@@ -4,11 +4,14 @@ import { CreatePlayerType, PlayerType } from '../types/Player';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
+import { GameType } from '../types/Game';
 
 class PlayerController {
   request;
+  gameRequest;
   constructor() {
     this.request = new Requests(config.MS_PLAYER_URL);
+    this.gameRequest = new Requests(config.MS_GAME_URL);
   }
 
   async create(req: RequestWithUser, res: Response) {
@@ -65,8 +68,18 @@ class PlayerController {
     try {
       const userId: string | undefined = req.user?.id ?? undefined
 
-      const data = await this.request.get(`/player?user_id=${userId}`);
-      res.json(data);
+      const data = (await this.request.get(`/player?user_id=${userId}`)) as PlayerType[];
+      const players:PlayerType[] = []
+      for(const p of data){
+        const player = {...p}
+        const games = await this.gameRequest.get(`/game?playerId=${p.id}`) as GameType[]
+        if(games && games.length > 0){
+          const game = games.find(g => !g.ended)
+          if(game) player.current_game_id = game.id
+        }
+        players.push(player)
+      }
+      res.json(players);
       return;
     } catch {
       res.sendStatus(500);

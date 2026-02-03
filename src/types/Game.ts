@@ -16,3 +16,14 @@ export interface Game {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface GameType {
+  id:string,
+  pv:number,
+  playerId:string,
+  consumables?: number[];
+  money?: number;
+  ended?: boolean;
+}
+
+export type DungeonType = "DUNGEON" | "SHOP" | "DATACENTER"
