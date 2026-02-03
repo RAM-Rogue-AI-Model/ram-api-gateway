@@ -111,14 +111,14 @@ class BattleController {
     try {
       const gameId = req.params.id as string;
 
-      const data = await this.request.get(
+      const data = (await this.request.get(
         `/battle/game/${gameId}`
-      );
+      )) as CreateBattleInput;
 
-      res.json(data);
+      res.json({...data, exist:true});
     } catch (error: any) {
       if (error?.response?.status === 404) {
-        res.json({ exist: 'none' });
+        res.json({ exist: false });
       } else {
         res.sendStatus(500);
       }
