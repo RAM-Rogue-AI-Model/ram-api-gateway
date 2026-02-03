@@ -13,6 +13,8 @@ import { PlayerRouter } from './routes/PlayerRouter';
 import { ShopRouter } from './routes/ShopRouter';
 import { UserRouter } from './routes/UserRouter';
 import { config } from './utils/config';
+import { BattleRouter } from './routes/BattleRouter';
+import { BattleController } from './controllers/BattleController';
 
 const app = express();
 const port = config.PORT || 3001;
@@ -31,6 +33,7 @@ const userController = new UserController();
 const playerController = new PlayerController();
 const gameController = new GameController();
 const itemController = new ItemController();
+const battleController = new BattleController();
 
 app.use('/api', new AuthenticateRouter(authenticateController).router);
 app.use('/api/user', new UserRouter(userController).router);
@@ -38,6 +41,7 @@ app.use('/api/player', new PlayerRouter(playerController).router);
 app.use('/api/game', new GameRouter(gameController).router);
 app.use('/api/shop', new ShopRouter(itemController).router);
 app.use('/api/item', new ItemRouter(itemController).router);
+app.use('/api/battle', new BattleRouter(battleController).router);
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console

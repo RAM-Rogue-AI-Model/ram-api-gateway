@@ -1,8 +1,8 @@
 import express, { Response, Router } from 'express';
 
+import { BattleController } from '../controllers/BattleController';
 import { RequestWithUser } from '../types/Request';
 import { authenticateJWT } from '../utils/auth';
-import { BattleController } from '../controllers/BattleController';
 
 class BattleRouter {
   public router: Router;
@@ -13,6 +13,21 @@ class BattleRouter {
       .route('/')
       .post(authenticateJWT, async (req: RequestWithUser, res: Response) => {
         await battleController.create(req, res);
+      });
+
+    this.router
+      .route('/:id')
+      .get(authenticateJWT, async (req: RequestWithUser, res: Response) => {
+        await battleController.get(req, res);
+      })
+      .delete(authenticateJWT, async (req: RequestWithUser, res: Response) => {
+        await battleController.delete(req, res);
+      });
+
+    this.router
+      .route('/:id/action')
+      .post(authenticateJWT, async (req: RequestWithUser, res: Response) => {
+        await battleController.performAction(req, res);
       });
   }
 }

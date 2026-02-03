@@ -1,0 +1,26 @@
+meta {
+  name: create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/battle
+  body: json
+  auth: inherit
+}
+
+headers {
+  x-internal-secret: 0ea03c49-f057-45c2-8300-b063fcc510d5
+}
+
+body:json {
+  {
+    "game_id" : "123"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

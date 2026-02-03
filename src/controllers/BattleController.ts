@@ -7,6 +7,7 @@ import { PlayerType } from '../types/Player';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
+import { Action } from '../types/Action';
 
 class BattleController {
   request;
@@ -47,6 +48,47 @@ class BattleController {
     } catch {
       res.sendStatus(500);
       return;
+    }
+  }
+
+  async performAction(req: RequestWithUser, res: Response) {
+    try {
+      const battleId = req.params.id as string;
+      const actionBody = req.body as Action;
+
+      const data = await this.request.post(
+        `/battle/${battleId}/action`,
+        JSON.stringify(actionBody)
+      );
+      res.json(data);
+    } catch {
+      res.sendStatus(500);
+    }
+  }
+
+  async get(req: RequestWithUser, res: Response) {
+    try {
+      const battleId = req.params.id as string;
+
+      const data = await this.request.get(
+        `/battle/${battleId}`
+      );
+      res.json(data);
+    } catch {
+      res.sendStatus(500);
+    }
+  }
+
+  async delete(req: RequestWithUser, res: Response) {
+    try {
+      const battleId = req.params.id as string;
+
+      await this.request.delete(
+        `/battle/${battleId}`
+      );
+      res.sendStatus(200);
+    } catch {
+      res.sendStatus(500);
     }
   }
 
