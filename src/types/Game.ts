@@ -26,4 +26,13 @@ export interface GameType {
   ended?: boolean;
 }
 
+export interface UpdateGameInput {
+  pv?: number;
+  playerId: string;
+  consumables?: number[];
+  money?: number;
+  ended?: boolean;
+  completed?: boolean;
+}
+
 export type DungeonType = "DUNGEON" | "SHOP" | "DATACENTER"

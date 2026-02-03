@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-import { CreateGameInput, DungeonType, GameType } from '../types/Game';
+import { CreateGameInput, DungeonType, GameType, UpdateGameInput } from '../types/Game';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
@@ -98,6 +98,25 @@ class GameController {
     } catch {
       res.sendStatus(500);
       return;
+    }
+  }
+
+  async update(req:RequestWithUser, res:Response){
+    try{
+      const id = req.params.id as string;
+
+      if(!id){
+        res.sendStatus(400);
+        return
+      }
+
+      const body = req.body as UpdateGameInput
+
+      const data = await this.request.patch(`/game/${id}`, JSON.stringify(body))
+      res.json(data)
+    } catch {
+      res.sendStatus(500)
+      return
     }
   }
 }

@@ -20,6 +20,9 @@ class GameRouter {
       .get(requestDetails, authenticateJWT, async (req: RequestWithUser, res: Response) => {
         await gameController.findOne(req, res);
       })
+      .patch(requestDetails, authenticateJWT, async (req: RequestWithUser, res: Response) => {
+        await gameController.update(req, res);
+      })
       .delete(requestDetails, authenticateJWT, async(req:RequestWithUser, res:Response) => {
         await gameController.deleteOne(req, res);
       });
