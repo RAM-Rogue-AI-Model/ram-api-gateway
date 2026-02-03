@@ -1,5 +1,6 @@
 import { Response } from 'express';
 
+import { Action } from '../types/Action';
 import { CreateBattleInput } from '../types/Battle';
 import { Enemy } from '../types/Enemy';
 import { Game } from '../types/Game';
@@ -7,7 +8,6 @@ import { PlayerType } from '../types/Player';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
-import { Action } from '../types/Action';
 
 class BattleController {
   request;
