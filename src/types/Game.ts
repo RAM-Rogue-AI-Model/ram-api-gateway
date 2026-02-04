@@ -15,6 +15,7 @@ export interface Game {
   steps: GameStep[];
   createdAt: Date;
   updatedAt: Date;
+  completed?:boolean|null; //FLAG A PASSER A "true" LORSQU'UNE ETAPE EST TERPINÉE
 }
 
 export interface GameType {

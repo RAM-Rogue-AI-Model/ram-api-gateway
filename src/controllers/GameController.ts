@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-import { Battle, CreateBattleInputError } from '../types/Battle';
+import { Battle, BattleError, CreateBattleInputError } from '../types/Battle';
 import { DUNGEON } from '../types/Dungeon';
 import {
   CreateGameInput,
@@ -166,17 +166,21 @@ class GameController {
         res.sendStatus(404);
         return;
       }
-      if(incompleteStep.type === DUNGEON.DUNGEON){
-        const battle = await this.battleRequest.get(`/battle/game/${game.id}`) as Battle | null;
+
+      if(incompleteStep.type === "DUNGEON"){
+        const battle = await this.battleRequest.get(`/battle/game/${game.id}`) as BattleError | null;
         if(!battle){
           res.sendStatus(404);
           return;
         }
-        if(battle.winner === 'enemy'){
-          game.ended = true;
+
+        if(!battle.error){
+          if(battle.winner === 'enemy'){
+            game.ended = true;
+          }
+          await this.battleRequest.delete(`/battle/${battle.id}`);
         }
-        await this.battleRequest.delete(`battle/${battle.id}`) as Battle;
-      }else if(incompleteStep.type === DUNGEON.SHOP){
+      }else if(incompleteStep.type === "SHOP"){
         const item = await this.itemRequest.get(`/item/${input.item_id}`) as Item | null;
         if(!item){
           res.sendStatus(404);
@@ -196,9 +200,8 @@ class GameController {
         }
         game.pv = Math.min(game.pv + 20, player.pv);
       }
-      incompleteStep.completed = true;
-
-      const data = await this.request.patch(`/game/${id}`, JSON.stringify(game))
+      game.completed = true;
+      const data = await this.request.patch(`/game/${id}`, JSON.stringify({...game, steps:undefined}))
       res.json(data)
     } catch {
       res.sendStatus(500)

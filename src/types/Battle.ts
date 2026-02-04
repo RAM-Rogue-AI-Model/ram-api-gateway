@@ -28,3 +28,7 @@ export interface Battle {
 export interface CreateBattleInputError extends CreateBattleInput {
   error?:boolean| null
 }
+
+export interface BattleError extends Battle {
+  error?:boolean| null
+}
