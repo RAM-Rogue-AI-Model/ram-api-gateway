@@ -4,6 +4,7 @@ import { Enemy } from './Enemy';
 import { PlayerType } from './Player';
 
 export interface CreateBattleInput {
+  id?:string | null;
   enemy: Enemy[];
   effect: Effect[];
   player: PlayerType;
@@ -22,4 +23,8 @@ export interface Battle {
   actions: ActionsTour;
   game_id: string;
   winner: 'player' | 'enemy' | null;
+}
+
+export interface CreateBattleInputError extends CreateBattleInput {
+  error?:boolean| null
 }

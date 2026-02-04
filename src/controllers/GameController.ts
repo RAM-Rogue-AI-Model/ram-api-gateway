@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-import { Battle } from '../types/Battle';
+import { Battle, CreateBattleInputError } from '../types/Battle';
 import { DUNGEON } from '../types/Dungeon';
 import {
   CreateGameInput,
@@ -67,7 +67,7 @@ class GameController {
       const attackQuery = req.query.attack as string;
       const speedQuery = req.query.speed as string;
 
-      if (!playerId || !id) {
+      if (!playerId || !id || !pvQuery || !attackQuery || !speedQuery) {
         res.sendStatus(400);
         return;
       }
