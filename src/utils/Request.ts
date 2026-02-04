@@ -40,7 +40,7 @@ class Requests {
       );
 
       return responseData;
-    } catch {
+    } catch (err) {
       throw new Error('Network response was not ok');
     }
   }

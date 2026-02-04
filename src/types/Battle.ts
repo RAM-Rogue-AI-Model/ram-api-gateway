@@ -23,3 +23,7 @@ export interface Battle {
   game_id: string;
   winner: 'player' | 'enemy' | null;
 }
+
+export interface CreateBattleInputError extends CreateBattleInput {
+  error?:boolean| null
+}

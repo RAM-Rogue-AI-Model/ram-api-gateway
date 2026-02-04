@@ -1,7 +1,7 @@
 import { Response } from 'express';
 
 import { Action } from '../types/Action';
-import { Battle, CreateBattleInput } from '../types/Battle';
+import { Battle, CreateBattleInput, CreateBattleInputError } from '../types/Battle';
 import { Enemy } from '../types/Enemy';
 import { Game } from '../types/Game';
 import { PlayerType } from '../types/Player';
@@ -29,12 +29,12 @@ class BattleController {
 
   async create(req: RequestWithUser, res: Response) {
     try {
-      const body = req.body as { game_id: string};
-      const game: Game = await this.request_game.get(`/game/${body.game_id}`) as Game;
-      const player : PlayerType = await this.request_player.get(`/user/${game.playerId}`) as PlayerType;
+      const body = req.body as { game_id: string, player_id:string};
+      const game: Game = await this.request_game.get(`/game/${body.game_id}?playerId=${body.player_id}`) as Game;
+      const player : PlayerType = await this.request_player.get(`/player/${game.playerId}`) as PlayerType;
       const step = game.steps.length;
       const enemyCount = Math.floor(step / 10) + 1;
-      const enemies = await this.request_enemy.get(`enemy?random=true&limit=${enemyCount}`) as Enemy[];
+      const enemies = await this.request_enemy.get(`/enemy?random=true&limit=${enemyCount}`) as Enemy[];
 
       const battleBody: CreateBattleInput = {
         effect: [],
@@ -113,15 +113,18 @@ class BattleController {
 
       const data = (await this.request.get(
         `/battle/game/${gameId}`
-      )) as CreateBattleInput;
+      )) as CreateBattleInputError;
 
-      res.json({...data, exist:true});
-    } catch (error: any) {
-      if (error?.response?.status === 404) {
-        res.json({ exist: false });
-      } else {
-        res.sendStatus(500);
+      if(data.error){
+        res.json({data:null, exist:false})
+        return
+      }else {
+        res.json({...data, exist:true});
+        return
       }
+    } catch {
+      res.sendStatus(500);
+      return
     }
   }
 
