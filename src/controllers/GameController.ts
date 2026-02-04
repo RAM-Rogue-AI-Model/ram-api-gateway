@@ -67,7 +67,7 @@ class GameController {
       const attackQuery = req.query.attack as string;
       const speedQuery = req.query.speed as string;
 
-      if (!playerId || !id || !pvQuery || !attackQuery || !speedQuery) {
+      if (!playerId || !id) {
         res.sendStatus(400);
         return;
       }
