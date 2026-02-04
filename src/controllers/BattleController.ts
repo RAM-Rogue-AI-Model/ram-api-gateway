@@ -84,7 +84,7 @@ class BattleController {
         await this.request.put('/battle', JSON.stringify(battle));
       }
 
-      const data = await this.request.post(
+      const data = await this.request.put(
         `/battle/${battleId}/action`,
         JSON.stringify(actionBody)
       );

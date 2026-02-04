@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-import { Battle } from '../types/Battle';
+import { Battle, CreateBattleInputError } from '../types/Battle';
 import { DUNGEON } from '../types/Dungeon';
 import {
   CreateGameInput,
@@ -66,43 +66,61 @@ class GameController {
       const pvQuery = req.query.pv as string;
       const attackQuery = req.query.attack as string;
       const speedQuery = req.query.speed as string;
+      const force = req.query.force as string;
 
-      if (!playerId || !id || !pvQuery || !attackQuery || !speedQuery) {
+      if (!playerId || !id ) {
         res.sendStatus(400);
         return;
       }
-      const pv = parseInt(pvQuery);
-      const attack = parseInt(attackQuery);
-      const speed = parseInt(speedQuery);
-      if (isNaN(pv) || isNaN(attack) || isNaN(speed)) {
-        res.sendStatus(400);
-        return;
-      }
-      const player = await this.playerRequest.get(`/player/${playerId}`) as PlayerType | null;
-      if(!player){
-        res.sendStatus(404);
-        return;
-      }
-      const game = await this.request.get(`/game/${id}?playerId=${playerId}`) as Game | null;
-      if(!game){
-        res.sendStatus(404);
-        return;
-      }
-      const gameStepLength = game.steps.length;
-      if (pv + attack + speed > gameStepLength) {
-        res.status(400).send({message:"Points exceed the number of steps in the game"});
-        return;
-      }
 
-      player.pv += pv;
-      player.attack += attack;
-      player.speed += speed;
-
-      await this.playerRequest.patch(`/player/${playerId}`, JSON.stringify(player)) as PlayerType;
-
-      
-      await this.request.delete(`/game/${id}?playerId=${playerId}`)
-      res.status(200).send({message:"Game deleted"})
+      if(force === "true"){
+        const battleRes = await this.battleRequest.get(`/battle/game/${id}`)
+        if(battleRes){
+          const data = battleRes as CreateBattleInputError
+          if(!data.error && data.id) await this.battleRequest.delete(`/battle/${data.id}`)
+        }
+        await this.request.delete(`/game/${id}?playerId=${playerId}`)
+        res.status(200).send({message:"Game deleted"})
+        return
+      }else{
+        if(!pvQuery || !attackQuery || !speedQuery){
+          res.sendStatus(400);
+          return;
+        }
+  
+        const pv = parseInt(pvQuery);
+        const attack = parseInt(attackQuery);
+        const speed = parseInt(speedQuery);
+        if (isNaN(pv) || isNaN(attack) || isNaN(speed)) {
+          res.sendStatus(400);
+          return;
+        }
+        const player = await this.playerRequest.get(`/player/${playerId}`) as PlayerType | null;
+        if(!player){
+          res.sendStatus(404);
+          return;
+        }
+        const game = await this.request.get(`/game/${id}?playerId=${playerId}`) as Game | null;
+        if(!game){
+          res.sendStatus(404);
+          return;
+        }
+        const gameStepLength = game.steps.length;
+        if (pv + attack + speed > gameStepLength) {
+          res.status(400).send({message:"Points exceed the number of steps in the game"});
+          return;
+        }
+  
+        player.pv += pv;
+        player.attack += attack;
+        player.speed += speed;
+  
+        await this.playerRequest.patch(`/player/${playerId}`, JSON.stringify(player)) as PlayerType;
+  
+        
+        await this.request.delete(`/game/${id}?playerId=${playerId}`)
+        res.status(200).send({message:"Game deleted"})
+      }
     } catch {
       res.sendStatus(500);
       return;
@@ -155,6 +173,7 @@ class GameController {
         res.sendStatus(400);
         return;
       }
+
       const game = await this.request.get(`/game/${id}?playerId=${input.player_id}`) as Game | null;
       if(!game){
         res.sendStatus(404);
@@ -166,17 +185,19 @@ class GameController {
         res.sendStatus(404);
         return;
       }
-      if(incompleteStep.type === DUNGEON.DUNGEON){
+
+      if(incompleteStep.type === "DUNGEON"){
         const battle = await this.battleRequest.get(`/battle/game/${game.id}`) as Battle | null;
         if(!battle){
           res.sendStatus(404);
           return;
         }
+
         if(battle.winner === 'enemy'){
           game.ended = true;
         }
-        await this.battleRequest.delete(`battle/${battle.id}`) as Battle;
-      }else if(incompleteStep.type === DUNGEON.SHOP){
+        await this.battleRequest.delete(`/battle/${battle.id}`) as Battle;
+      }else if(incompleteStep.type === "SHOP"){
         const item = await this.itemRequest.get(`/item/${input.item_id}`) as Item | null;
         if(!item){
           res.sendStatus(404);

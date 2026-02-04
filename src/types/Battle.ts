@@ -4,6 +4,7 @@ import { Enemy } from './Enemy';
 import { PlayerType } from './Player';
 
 export interface CreateBattleInput {
+  id?:string | null;
   enemy: Enemy[];
   effect: Effect[];
   player: PlayerType;
