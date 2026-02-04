@@ -1,7 +1,7 @@
+import { ActionsTour } from './Actions';
 import { Effect } from './Effect';
 import { Enemy } from './Enemy';
 import { PlayerType } from './Player';
-import { Actions } from './Actions';
 
 export interface CreateBattleInput {
   enemy: Enemy[];
@@ -19,7 +19,7 @@ export interface Battle {
   player: PlayerType;
   pv: number;
   level_dungeon: number;
-  actions: Actions;
+  actions: ActionsTour;
   game_id: string;
   winner: 'player' | 'enemy' | null;
 }
