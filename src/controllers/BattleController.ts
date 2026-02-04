@@ -1,24 +1,30 @@
 import { Response } from 'express';
 
 import { Action } from '../types/Action';
-import { CreateBattleInput } from '../types/Battle';
+import { Battle, CreateBattleInput } from '../types/Battle';
 import { Enemy } from '../types/Enemy';
 import { Game } from '../types/Game';
 import { PlayerType } from '../types/Player';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
+import { Item } from '../types/Item';
+import { Effect } from '../types/Effect';
 
 class BattleController {
   request;
   request_game;
   request_player;
   request_enemy;
+  request_item;
+  request_effect;
   constructor() {
     this.request = new Requests(config.MS_BATTLE_URL);
     this.request_game = new Requests(config.MS_GAME_URL);
     this.request_player = new Requests(config.MS_PLAYER_URL);
     this.request_enemy = new Requests(config.MS_ENEMY_URL);
+    this.request_item = new Requests(config.MS_ITEM_URL);
+    this.request_effect = new Requests(config.MS_EFFECT_URL);
   }
 
   async create(req: RequestWithUser, res: Response) {
@@ -55,6 +61,28 @@ class BattleController {
     try {
       const battleId = req.params.id as string;
       const actionBody = req.body as Action;
+      const battle = await this.request.get(
+        `/battle/${battleId}`
+      ) as Battle | null;
+      if(!battle){
+        res.sendStatus(404).json({ error: 'BATTLE Not Found' });
+        return;
+      }
+      if(actionBody.type === 'item' && actionBody.item_id) {
+        const item = await this.request_item.get(`/item/${actionBody.item_id}`) as Item | null;
+        if(!item){
+          res.sendStatus(404).json({ error: 'ITEM Not Found' });
+          return;
+        }
+        const effect = await this.request_effect.get(`/effect/${item.effect_id}`) as Effect | null;
+        if(!effect){
+          res.sendStatus(404).json({ error: 'EFFECT ITEM Not Found' });
+          return;
+        }
+          battle.effect.push(effect);
+
+        await this.request.put('/battle', JSON.stringify(battle));
+      }
 
       const data = await this.request.post(
         `/battle/${battleId}/action`,
