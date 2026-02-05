@@ -69,6 +69,7 @@ bruno/
 Tous les endpoints (sauf `/register` et `/login`) nécessitent un token JWT valide.
 
 Le token est automatiquement :
+
 - Sauvegardé après un login réussi (grâce au script post-response)
 - Utilisé dans les requêtes authentifiées (via `auth:bearer`)
 
@@ -92,16 +93,19 @@ Vous pouvez modifier les corps de requêtes JSON dans chaque fichier `.bru` selo
 ## 📊 Endpoints disponibles
 
 ### Authentication
+
 - `POST /api/register` - Créer un compte
 - `POST /api/login` - Se connecter
 
 ### User
+
 - `GET /api/user/me` - Obtenir les infos de l'utilisateur connecté
 - `PATCH /api/user/:id/rename` - Renommer un utilisateur
 - `PATCH /api/user/:id/password` - Changer le mot de passe
 - `DELETE /api/user/:id` - Supprimer un utilisateur
 
 ### Player
+
 - `POST /api/player` - Créer un joueur
 - `GET /api/player` - Lister tous les joueurs
 - `GET /api/player/:id` - Obtenir un joueur
@@ -109,15 +113,18 @@ Vous pouvez modifier les corps de requêtes JSON dans chaque fichier `.bru` selo
 - `DELETE /api/player/:id` - Supprimer un joueur
 
 ### Game
+
 - `POST /api/game` - Créer une partie
 
 ### Item
+
 - `POST /api/item` - Créer un item
 - `GET /api/item/:id` - Obtenir un item
 - `PUT /api/item/:id` - Mettre à jour un item
 - `DELETE /api/item/:id` - Supprimer un item
 
 ### Shop
+
 - `GET /api/shop/:level` - Obtenir les items du shop par niveau
 
 ## 💡 Astuces

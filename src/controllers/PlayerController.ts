@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
+import { GameType } from '../types/Game';
 import { CreatePlayerType, PlayerType } from '../types/Player';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
-import { GameType } from '../types/Game';
 
 class PlayerController {
   request;
@@ -48,7 +48,7 @@ class PlayerController {
   async findOne(req: RequestWithUser, res: Response) {
     try {
       const id: string = req.params.id as string;
-      const userId: string | undefined = req.user?.id ?? undefined
+      const userId: string | undefined = req.user?.id ?? undefined;
 
       if (!userId || !id) {
         res.sendStatus(400);
@@ -66,18 +66,22 @@ class PlayerController {
 
   async findAll(req: RequestWithUser, res: Response) {
     try {
-      const userId: string | undefined = req.user?.id ?? undefined
+      const userId: string | undefined = req.user?.id ?? undefined;
 
-      const data = (await this.request.get(`/player?user_id=${userId}`)) as PlayerType[];
-      const players:PlayerType[] = []
-      for(const p of data){
-        const player = {...p}
-        const games = await this.gameRequest.get(`/game?playerId=${p.id}`) as GameType[]
-        if(games && games.length > 0){
-          const game = games.find(g => !g.ended)
-          if(game) player.current_game_id = game.id
+      const data = (await this.request.get(
+        `/player?user_id=${userId}`
+      )) as PlayerType[];
+      const players: PlayerType[] = [];
+      for (const p of data) {
+        const player = { ...p };
+        const games = (await this.gameRequest.get(`/game?playerId=${p.id}`)) as
+          | GameType[]
+          | undefined;
+        if (games && games.length > 0) {
+          const game = games.find((g) => !g.ended);
+          if (game) player.current_game_id = game.id;
         }
-        players.push(player)
+        players.push(player);
       }
       res.json(players);
       return;

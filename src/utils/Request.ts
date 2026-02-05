@@ -41,6 +41,7 @@ class Requests {
 
       return responseData;
     } catch (err) {
+      console.error('Error getting data:', err);
       throw new Error('Network response was not ok');
     }
   }

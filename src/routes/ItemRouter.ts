@@ -1,7 +1,6 @@
 import express, { Response, Router } from 'express';
 
 import { ItemController } from '../controllers/ItemController';
-import { PlayerController } from '../controllers/PlayerController';
 import { RequestWithUser } from '../types/Request';
 import { authenticateJWT } from '../utils/auth';
 
@@ -14,7 +13,7 @@ class ItemRouter {
       .route('/')
       .post(authenticateJWT, async (req: RequestWithUser, res: Response) => {
         await itemController.create(req, res);
-      })
+      });
 
     this.router
       .route('/:id')

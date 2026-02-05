@@ -1,13 +1,7 @@
 import { Response } from 'express';
 
-import { Battle, BattleError, CreateBattleInputError } from '../types/Battle';
-import { DUNGEON } from '../types/Dungeon';
-import {
-  CreateGameInput,
-  DungeonType,
-  Game,
-  GameType,
-} from '../types/Game';
+import { BattleError } from '../types/Battle';
+import { CreateGameInput, DungeonType, Game, GameType } from '../types/Game';
 import { Item } from '../types/Item';
 import { PlayerType } from '../types/Player';
 import { RequestWithUser } from '../types/Request';
@@ -24,8 +18,6 @@ class GameController {
     this.playerRequest = new Requests(config.MS_PLAYER_URL);
     this.battleRequest = new Requests(config.MS_BATTLE_URL);
     this.itemRequest = new Requests(config.MS_ITEM_URL);
-
-
   }
 
   async create(req: RequestWithUser, res: Response) {
@@ -50,16 +42,20 @@ class GameController {
         return;
       }
 
-      const data = (await this.request.get(`/game/${id}?playerId=${playerId}`)) as GameType;
-      const player = (await this.playerRequest.get(`/player/${playerId}`)) as PlayerType;
-      res.json({game:data, player:player});
+      const data = (await this.request.get(
+        `/game/${id}?playerId=${playerId}`
+      )) as GameType;
+      const player = (await this.playerRequest.get(
+        `/player/${playerId}`
+      )) as PlayerType;
+      res.json({ game: data, player: player });
     } catch {
       res.sendStatus(500);
       return;
     }
   }
 
-  async deleteOne(req: RequestWithUser, res: Response){
+  async deleteOne(req: RequestWithUser, res: Response) {
     try {
       const id = req.params.id as string;
       const playerId = req.query.playerId as string;
@@ -78,19 +74,25 @@ class GameController {
         res.sendStatus(400);
         return;
       }
-      const player = await this.playerRequest.get(`/player/${playerId}`) as PlayerType | null;
-      if(!player){
+      const player = (await this.playerRequest.get(
+        `/player/${playerId}`
+      )) as PlayerType | null;
+      if (!player) {
         res.sendStatus(404);
         return;
       }
-      const game = await this.request.get(`/game/${id}?playerId=${playerId}`) as Game | null;
-      if(!game){
+      const game = (await this.request.get(
+        `/game/${id}?playerId=${playerId}`
+      )) as Game | null;
+      if (!game) {
         res.sendStatus(404);
         return;
       }
       const gameStepLength = game.steps.length;
       if (pv + attack + speed > gameStepLength) {
-        res.status(400).send({message:"Points exceed the number of steps in the game"});
+        res
+          .status(400)
+          .send({ message: 'Points exceed the number of steps in the game' });
         return;
       }
 
@@ -98,18 +100,20 @@ class GameController {
       player.attack += attack;
       player.speed += speed;
 
-      await this.playerRequest.patch(`/player/${playerId}`, JSON.stringify(player)) as PlayerType;
+      (await this.playerRequest.patch(
+        `/player/${playerId}`,
+        JSON.stringify(player)
+      )) as PlayerType;
 
-      
-      await this.request.delete(`/game/${id}?playerId=${playerId}`)
-      res.status(200).send({message:"Game deleted"})
+      await this.request.delete(`/game/${id}?playerId=${playerId}`);
+      res.status(200).send({ message: 'Game deleted' });
     } catch {
       res.sendStatus(500);
       return;
     }
   }
 
-  async getChoices(req:RequestWithUser, res:Response) {
+  async getChoices(req: RequestWithUser, res: Response) {
     try {
       const id = req.params.id as string;
       const playerId = req.query.playerId as string;
@@ -118,16 +122,18 @@ class GameController {
         res.sendStatus(400);
         return;
       }
-      
-      const data = await this.request.get(`/game/${id}/dungeon/choice?playerId=${playerId}`)
-      res.json(data)
+
+      const data = await this.request.get(
+        `/game/${id}/dungeon/choice?playerId=${playerId}`
+      );
+      res.json(data);
     } catch {
       res.sendStatus(500);
       return;
     }
   }
 
-  async chooseDungeon(req:RequestWithUser, res:Response){
+  async chooseDungeon(req: RequestWithUser, res: Response) {
     try {
       const id = req.params.id as string;
       const playerId = req.query.playerId as string;
@@ -138,74 +144,88 @@ class GameController {
       }
 
       const body = req.body as { type: DungeonType };
-      
-      const data = await this.request.put(`/game/${id}/dungeon?playerId=${playerId}`, JSON.stringify(body))
-      res.json(data)
+
+      const data = await this.request.put(
+        `/game/${id}/dungeon?playerId=${playerId}`,
+        JSON.stringify(body)
+      );
+      res.json(data);
     } catch {
       res.sendStatus(500);
       return;
     }
   }
 
-  async update(req:RequestWithUser, res:Response){
-    try{
+  async update(req: RequestWithUser, res: Response) {
+    try {
       const id = req.params.id as string;
-      const input = req.body as { player_id: string ,item_id?: string };
+      const input = req.body as { player_id: string; item_id?: string };
       if (!id) {
         res.sendStatus(400);
         return;
       }
-      const game = await this.request.get(`/game/${id}?playerId=${input.player_id}`) as Game | null;
-      if(!game){
+      const game = (await this.request.get(
+        `/game/${id}?playerId=${input.player_id}`
+      )) as Game | null;
+      if (!game) {
         res.sendStatus(404);
         return;
       }
 
-      const incompleteStep = game.steps.find(step => !step.completed);
+      const incompleteStep = game.steps.find((step) => !step.completed);
       if (!incompleteStep) {
         res.sendStatus(404);
         return;
       }
 
-      if(incompleteStep.type === "DUNGEON"){
-        const battle = await this.battleRequest.get(`/battle/game/${game.id}`) as BattleError | null;
-        if(!battle){
+      if (incompleteStep.type === 'DUNGEON') {
+        const battle = (await this.battleRequest.get(
+          `/battle/game/${game.id}`
+        )) as BattleError | null;
+        if (!battle) {
           res.sendStatus(404);
           return;
         }
 
-        if(!battle.error){
-          if(battle.winner === 'enemy'){
+        if (!battle.error) {
+          if (battle.winner === 'enemy') {
             game.ended = true;
           }
           await this.battleRequest.delete(`/battle/${battle.id}`);
         }
-      }else if(incompleteStep.type === "SHOP"){
-        const item = await this.itemRequest.get(`/item/${input.item_id}`) as Item | null;
-        if(!item){
+      } else if (incompleteStep.type === 'SHOP') {
+        const item = (await this.itemRequest.get(
+          `/item/${input.item_id}`
+        )) as Item | null;
+        if (!item) {
           res.sendStatus(404);
           return;
         }
-        if(game.money < item.price){
-          res.status(400).send({message:"Not enough money"});
+        if (game.money < item.price) {
+          res.status(400).send({ message: 'Not enough money' });
           return;
         }
         game.money -= item.price;
         game.consumables.push(item.id);
-      }else{
-        const player = await this.playerRequest.get(`/player/${input.player_id}`) as PlayerType | null;
-        if(!player){
+      } else {
+        const player = (await this.playerRequest.get(
+          `/player/${input.player_id}`
+        )) as PlayerType | null;
+        if (!player) {
           res.sendStatus(404);
           return;
         }
         game.pv = Math.min(game.pv + 20, player.pv);
       }
       game.completed = true;
-      const data = await this.request.patch(`/game/${id}`, JSON.stringify({...game, steps:undefined}))
-      res.json(data)
+      const data = await this.request.patch(
+        `/game/${id}`,
+        JSON.stringify({ ...game, steps: undefined })
+      );
+      res.json(data);
     } catch {
-      res.sendStatus(500)
-      return
+      res.sendStatus(500);
+      return;
     }
   }
 }

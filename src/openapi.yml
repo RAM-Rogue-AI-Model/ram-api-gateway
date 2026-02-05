@@ -1,0 +1,657 @@
+openapi: 3.0.0
+info:
+  title: RAM API Gateway
+  description: Documentation complète de l'API Gateway du projet RAM
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001
+    description: Serveur Local
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterUserBody:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        confirmPassword:
+          type: string
+
+    LoginUserBody:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    AuthenticatedUser:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        isAdmin:
+          type: boolean
+        token:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        isAdmin:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UpdateUserBody:
+      type: object
+      properties:
+        password:
+          type: string
+        username:
+          type: string
+        newPassword:
+          type: string
+        confirmPassword:
+          type: string
+
+    Player:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        pv:
+          type: number
+        attack:
+          type: number
+        speed:
+          type: number
+        user_id:
+          type: string
+        current_game_id:
+          type: string
+
+    CreatePlayerBody:
+      type: object
+      required:
+        - name
+        - pv
+        - attack
+        - speed
+      properties:
+        name:
+          type: string
+        pv:
+          type: number
+        attack:
+          type: number
+        speed:
+          type: number
+
+    Game:
+      type: object
+      properties:
+        id:
+          type: string
+        pv:
+          type: number
+        consumables:
+          type: array
+          items:
+            type: string
+        money:
+          type: number
+        playerId:
+          type: string
+        ended:
+          type: boolean
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/GameStep'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        completed:
+          type: boolean
+
+    GameStep:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [battle, shop, rest]
+        status:
+          type: string
+          enum: [pending, in_progress, completed]
+
+    Item:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        level_gap:
+          type: number
+        effect_name:
+          type: string
+        effect_id:
+          type: string
+
+    Battle:
+      type: object
+      properties:
+        id:
+          type: string
+        enemy:
+          type: array
+          items:
+            $ref: '#/components/schemas/Enemy'
+        effect:
+          type: array
+          items:
+            $ref: '#/components/schemas/Effect'
+        player:
+          $ref: '#/components/schemas/Player'
+        pv:
+          type: number
+        level_dungeon:
+          type: number
+        game_id:
+          type: string
+        winner:
+          type: string
+          enum: [player, enemy, null]
+
+    Enemy:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        pv:
+          type: number
+        attack:
+          type: number
+        speed:
+          type: number
+        probability_attack:
+          type: number
+
+    Effect:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        duration:
+          type: number
+
+    Action:
+      type: object
+      required:
+        - type
+        - target_id
+      properties:
+        type:
+          type: string
+          enum: [attack, item, defend]
+        target_id:
+          type: string
+        item_id:
+          type: string
+
+paths:
+  /api/register:
+    post:
+      summary: Inscription d'un nouvel utilisateur
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUserBody'
+      responses:
+        '201':
+          description: Utilisateur créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedUser'
+        '400':
+          description: Données invalides
+
+  /api/login:
+    post:
+      summary: Connexion utilisateur
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserBody'
+      responses:
+        '200':
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedUser'
+        '401':
+          description: Identifiants invalides
+
+  /api/user/me:
+    get:
+      summary: Récupérer les informations de l'utilisateur connecté
+      tags: [User]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Informations utilisateur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedUser'
+        '401':
+          description: Non authentifié
+
+  /api/user/{id}/rename:
+    patch:
+      summary: Renommer un utilisateur
+      tags: [User]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID de l'utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+      responses:
+        '200':
+          description: Utilisateur renommé
+        '403':
+          description: Non autorisé
+
+  /api/user/{id}/password:
+    patch:
+      summary: Changer le mot de passe
+      tags: [User]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserBody'
+      responses:
+        '200':
+          description: Mot de passe mis à jour
+
+  /api/user/{id}:
+    delete:
+      summary: Supprimer un utilisateur
+      tags: [User]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Utilisateur supprimé
+
+  /api/player:
+    get:
+      summary: Récupérer tous les joueurs de l'utilisateur
+      tags: [Player]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des joueurs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Player'
+    post:
+      summary: Créer un joueur
+      tags: [Player]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePlayerBody'
+      responses:
+        '201':
+          description: Joueur créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+
+  /api/player/{id}:
+    get:
+      summary: Récupérer un joueur par ID
+      tags: [Player]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Détails du joueur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+    put:
+      summary: 'Mettre à jour un joueur (ex: stats)'
+      tags: [Player]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Joueur mis à jour
+    delete:
+      summary: Supprimer un joueur
+      tags: [Player]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Joueur supprimé
+
+  /api/game:
+    post:
+      summary: Créer une nouvelle partie
+      tags: [Game]
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Partie créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+
+  /api/game/{id}:
+    get:
+      summary: Récupérer une partie
+      tags: [Game]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Détails de la partie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+
+  /api/game/{id}/choices:
+    get:
+      summary: Récupérer les choix disponibles (route, etc.)
+      tags: [Game]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Choix disponibles
+
+  /api/game/{id}/dungeon:
+    put:
+      summary: Choisir un donjon / avancer
+      tags: [Game]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Choix validé
+
+  /api/shop/{level}:
+    get:
+      summary: Récupérer les items du shop par niveau
+      tags: [Shop]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: level
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Liste des items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+
+  /api/battle:
+    post:
+      summary: Initialiser un combat
+      tags: [Battle]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gameId:
+                  type: string
+      responses:
+        '201':
+          description: Combat créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Battle'
+
+  /api/battle/game/{id}:
+    get:
+      summary: Récupérer le combat associé à une partie
+      tags: [Battle]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Combat actuel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Battle'
+
+  /api/battle/{id}:
+    get:
+      summary: Récupérer un combat par ID
+      tags: [Battle]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Détails du combat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Battle'
+    delete:
+      summary: Supprimer/Terminer un combat
+      tags: [Battle]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Combat supprimé
+
+  /api/battle/{id}/action:
+    post:
+      summary: Effectuer une action dans le combat
+      tags: [Battle]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Action'
+      responses:
+        '200':
+          description: Résultat de l'action (tour suivant)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Battle'
+
+  /api/item:
+    get:
+      summary: Récupérer un item
+      tags: [Item]
+      security:
+        - bearerAuth: []
+
+  /api/item/{id}:
+    get:
+      summary: Récupérer les détails d'un item
+      tags: [Item]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string

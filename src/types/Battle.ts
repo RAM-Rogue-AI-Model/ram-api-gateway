@@ -4,7 +4,7 @@ import { Enemy } from './Enemy';
 import { PlayerType } from './Player';
 
 export interface CreateBattleInput {
-  id?:string | null;
+  id?: string | null;
   enemy: Enemy[];
   effect: Effect[];
   player: PlayerType;
@@ -26,9 +26,9 @@ export interface Battle {
 }
 
 export interface CreateBattleInputError extends CreateBattleInput {
-  error?:boolean| null
+  error?: boolean | null;
 }
 
 export interface BattleError extends Battle {
-  error?:boolean| null
+  error?: boolean | null;
 }

@@ -65,10 +65,14 @@ class UserController {
       const id = req.params.id as string;
       const body = req.body as UpdateUserBody;
 
-      const data = await this.request.patch(`/user/${id}/password`, JSON.stringify(body));
+      const data = await this.request.patch(
+        `/user/${id}/password`,
+        JSON.stringify(body)
+      );
       res.json(data);
       return;
     } catch (err) {
+      console.error('Error changing password:', err);
       res.sendStatus(500);
       return;
     }
@@ -85,7 +89,8 @@ class UserController {
       );
       res.json(data);
       return;
-    } catch {
+    } catch (err) {
+      console.error('Error renaming user:', err);
       res.sendStatus(500);
       return;
     }

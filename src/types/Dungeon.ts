@@ -1,4 +1,1 @@
-export type DUNGEON =
-  "DUNGEON" |
-  "SHOP" |
-  "DATACENTER"
+export type DUNGEON = 'DUNGEON' | 'SHOP' | 'DATACENTER';

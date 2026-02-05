@@ -1,15 +1,19 @@
 import { Response } from 'express';
 
 import { Action } from '../types/Action';
-import { Battle, CreateBattleInput, CreateBattleInputError } from '../types/Battle';
+import {
+  Battle,
+  CreateBattleInput,
+  CreateBattleInputError,
+} from '../types/Battle';
+import { Effect } from '../types/Effect';
 import { Enemy } from '../types/Enemy';
 import { Game } from '../types/Game';
+import { Item } from '../types/Item';
 import { PlayerType } from '../types/Player';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
-import { Item } from '../types/Item';
-import { Effect } from '../types/Effect';
 
 class BattleController {
   request;
@@ -29,12 +33,18 @@ class BattleController {
 
   async create(req: RequestWithUser, res: Response) {
     try {
-      const body = req.body as { game_id: string, player_id:string};
-      const game: Game = await this.request_game.get(`/game/${body.game_id}?playerId=${body.player_id}`) as Game;
-      const player : PlayerType = await this.request_player.get(`/player/${game.playerId}`) as PlayerType;
+      const body = req.body as { game_id: string; player_id: string };
+      const game: Game = (await this.request_game.get(
+        `/game/${body.game_id}?playerId=${body.player_id}`
+      )) as Game;
+      const player: PlayerType = (await this.request_player.get(
+        `/player/${game.playerId}`
+      )) as PlayerType;
       const step = game.steps.length;
       const enemyCount = Math.floor(step / 10) + 1;
-      const enemies = await this.request_enemy.get(`/enemy?random=true&limit=${enemyCount}`) as Enemy[];
+      const enemies = (await this.request_enemy.get(
+        `/enemy?random=true&limit=${enemyCount}`
+      )) as Enemy[];
 
       const battleBody: CreateBattleInput = {
         effect: [],
@@ -44,7 +54,6 @@ class BattleController {
         player: player,
         pv: player.pv,
       };
-
 
       const data = await this.request.post(
         '/battle',
@@ -61,25 +70,29 @@ class BattleController {
     try {
       const battleId = req.params.id as string;
       const actionBody = req.body as Action;
-      const battle = await this.request.get(
+      const battle = (await this.request.get(
         `/battle/${battleId}`
-      ) as Battle | null;
-      if(!battle){
+      )) as Battle | null;
+      if (!battle) {
         res.sendStatus(404).json({ error: 'BATTLE Not Found' });
         return;
       }
-      if(actionBody.type === 'item' && actionBody.item_id) {
-        const item = await this.request_item.get(`/item/${actionBody.item_id}`) as Item | null;
-        if(!item){
+      if (actionBody.type === 'item' && actionBody.item_id) {
+        const item = (await this.request_item.get(
+          `/item/${actionBody.item_id}`
+        )) as Item | null;
+        if (!item) {
           res.sendStatus(404).json({ error: 'ITEM Not Found' });
           return;
         }
-        const effect = await this.request_effect.get(`/effect/${item.effect_id}`) as Effect | null;
-        if(!effect){
+        const effect = (await this.request_effect.get(
+          `/effect/${item.effect_id}`
+        )) as Effect | null;
+        if (!effect) {
           res.sendStatus(404).json({ error: 'EFFECT ITEM Not Found' });
           return;
         }
-          battle.effect.push(effect);
+        battle.effect.push(effect);
 
         await this.request.put('/battle', JSON.stringify(battle));
       }
@@ -98,9 +111,7 @@ class BattleController {
     try {
       const battleId = req.params.id as string;
 
-      const data = await this.request.get(
-        `/battle/${battleId}`
-      );
+      const data = await this.request.get(`/battle/${battleId}`);
       res.json(data);
     } catch {
       res.sendStatus(500);
@@ -115,16 +126,16 @@ class BattleController {
         `/battle/game/${gameId}`
       )) as CreateBattleInputError;
 
-      if(data.error){
-        res.json({data:null, exist:false})
-        return
-      }else {
-        res.json({...data, exist:true});
-        return
+      if (data.error) {
+        res.json({ data: null, exist: false });
+        return;
+      } else {
+        res.json({ ...data, exist: true });
+        return;
       }
     } catch {
       res.sendStatus(500);
-      return
+      return;
     }
   }
 
@@ -132,15 +143,12 @@ class BattleController {
     try {
       const battleId = req.params.id as string;
 
-      await this.request.delete(
-        `/battle/${battleId}`
-      );
+      await this.request.delete(`/battle/${battleId}`);
       res.sendStatus(200);
     } catch {
       res.sendStatus(500);
     }
   }
-
 }
 
 export { BattleController };
