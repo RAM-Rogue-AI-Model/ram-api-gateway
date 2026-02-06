@@ -92,9 +92,9 @@ class BattleController {
           res.sendStatus(404).json({ error: 'EFFECT ITEM Not Found' });
           return;
         }
-        battle.effect.push(effect);
 
-        await this.request.put('/battle', JSON.stringify(battle));
+        battle.effect.push(effect);
+        await this.request.put(`/battle/${battle.id}`, JSON.stringify(battle));
       }
 
       const data = await this.request.put(

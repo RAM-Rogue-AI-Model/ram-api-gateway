@@ -1,4 +1,5 @@
 import { GameStep } from './GameStep';
+import { Item } from './Item';
 
 export interface CreateGameInput {
   pv: number;
@@ -23,6 +24,15 @@ export interface GameType {
   pv: number;
   playerId: string;
   consumables?: number[];
+  money?: number;
+  ended?: boolean;
+}
+
+export interface GameConsumablesType {
+  id:string,
+  pv:number,
+  playerId:string,
+  consumables?: Item[];
   money?: number;
   ended?: boolean;
 }

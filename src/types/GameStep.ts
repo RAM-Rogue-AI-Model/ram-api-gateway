@@ -1,7 +1,7 @@
 import { DUNGEON } from './Dungeon';
 
 export interface GameStep {
-  id: string;
+  id: number;
   type: DUNGEON;
   completed: boolean;
   date_add: Date;

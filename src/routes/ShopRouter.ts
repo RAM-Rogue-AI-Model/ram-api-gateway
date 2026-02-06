@@ -2,7 +2,7 @@ import express, { Response, Router } from 'express';
 
 import { ItemController } from '../controllers/ItemController';
 import { RequestWithUser } from '../types/Request';
-import { authenticateJWT } from '../utils/auth';
+import { authenticateJWT, requestDetails } from '../utils/auth';
 
 class ShopRouter {
   public router: Router;
@@ -10,8 +10,8 @@ class ShopRouter {
     this.router = express.Router();
 
     this.router
-      .route('/:level')
-      .get(authenticateJWT, async (req: RequestWithUser, res: Response) => {
+      .route('/:gameId')
+      .get(requestDetails, authenticateJWT, async (req: RequestWithUser, res: Response) => {
         await itemController.findAll(req, res);
       });
   }

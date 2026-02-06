@@ -1,14 +1,17 @@
 import { Request, Response } from 'express';
 
-import { CreateItemInput } from '../types/Item';
+import { CreateItemInput, Item } from '../types/Item';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
+import { Game } from '../types/Game';
 
 class ItemController {
   request;
+  gameRequest;
   constructor() {
     this.request = new Requests(config.MS_ITEM_URL);
+    this.gameRequest = new Requests(config.MS_GAME_URL);
   }
 
   async create(req: RequestWithUser, res: Response) {
@@ -25,14 +28,23 @@ class ItemController {
 
   async findAll(req: Request, res: Response) {
     try {
-      const level: string = req.params.level as string;
-      const levelNum = parseInt(level);
-      if (isNaN(levelNum)) {
+      const gameId = req.params.gameId as string;
+      const playerId = req.query.playerId as string;
+
+      if (!playerId || !gameId) {
         res.sendStatus(400);
         return;
       }
 
-      const data = await this.request.get(`/item?level=${levelNum}`);
+      const gameData = (await this.gameRequest.get(`/game/${gameId}?playerId=${playerId}`)) as Game;
+
+      const level: number = gameData.steps.length
+      if (isNaN(level)) {
+        res.sendStatus(400);
+        return;
+      }
+
+      const data = (await this.request.get(`/item?level=${level}`)) as Item[];
       res.json(data);
       return;
     } catch {
