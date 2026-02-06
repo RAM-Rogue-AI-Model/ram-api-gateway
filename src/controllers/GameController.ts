@@ -26,6 +26,15 @@ class GameController {
     this.itemRequest = new Requests(config.MS_ITEM_URL);
   }
 
+  getConsumables = async (consumablesIds : string[]) => {
+    const consumablesTmp:Item[] = []
+    for(const consumablesId of consumablesIds){
+      const data = (await this.itemRequest.get(`/item/${consumablesId}`)) as Item
+      consumablesTmp.push(data)
+    }
+    return consumablesTmp
+  }
+
   async create(req: RequestWithUser, res: Response) {
     try {
       const body = req.body as CreateGameInput;
@@ -52,13 +61,7 @@ class GameController {
       const player = (await this.playerRequest.get(`/player/${playerId}`)) as PlayerType;
 
       if(data.consumables){
-        const dataWithConsumable = {...data, consumables:[]} as GameConsumablesType
-        for(const itemId of data.consumables){
-          const data = (await this.itemRequest.get(`/item/${itemId}`)) as Item
-          if(!dataWithConsumable.consumables) dataWithConsumable.consumables = []
-          dataWithConsumable.consumables.push(data)
-        }
-
+        const dataWithConsumable = {...data, consumables:await this.getConsumables(data.consumables)} as GameConsumablesType
         res.json({game:dataWithConsumable, player:player}); 
       }else res.json({game:data, player:player}); 
 
@@ -209,6 +212,17 @@ class GameController {
           return;
         }
 
+        if(game.consumables && battle.effect){
+          const consumables = await this.getConsumables(game.consumables)
+          for(let i = 0; i < battle.effect.length; i++){
+            const effect = battle.effect[i]
+            const item = consumables.find(i => i.effect_id === effect.id)
+            if(item) consumables.splice(consumables.indexOf(item), 1)
+          }
+
+          game.consumables = consumables.map(c => c.id)
+        }
+
         if (!battle.error) {
           if (battle.winner === 'enemy') {
             game.ended = true;
@@ -216,7 +230,7 @@ class GameController {
           await this.battleRequest.delete(`/battle/${battle.id}`);
         }
         game.pv = battle.pv
-        game.money += 100
+        game.money += 20 * (1 + Math.floor(game.steps.length / 10))
       }else if(incompleteStep.type === "SHOP"){
         if(input.item_id){
           const item = await this.itemRequest.get(`/item/${input.item_id}`) as Item | null;
@@ -240,11 +254,12 @@ class GameController {
         game.pv = Math.min(game.pv + 20, player.pv);
       }
       game.completed = true;
-      const data = await this.request.patch(
+      const consumables = await this.getConsumables(game.consumables)
+      const data = (await this.request.patch(
         `/game/${id}`,
         JSON.stringify({ ...game, steps: undefined })
-      );
-      res.json(data);
+      )) as Game
+      res.json({...data, consumables:consumables});
     } catch {
       res.sendStatus(500);
       return;

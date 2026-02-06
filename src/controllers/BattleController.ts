@@ -52,7 +52,7 @@ class BattleController {
         game_id: game.id,
         level_dungeon: 0,
         player: player,
-        pv: player.pv,
+        pv: game.pv,
       };
 
       const data = await this.request.post(

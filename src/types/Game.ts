@@ -23,7 +23,7 @@ export interface GameType {
   id: string;
   pv: number;
   playerId: string;
-  consumables?: number[];
+  consumables?: string[];
   money?: number;
   ended?: boolean;
 }
