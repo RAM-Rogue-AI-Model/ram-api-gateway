@@ -39,7 +39,15 @@ const requestDetails = (
 ) => {
   const today = new Date();
   // eslint-disable-next-line no-console
-  console.log(req.method + ' - ' + req.baseUrl + ' - ' + req.url + ' - ' + today.toLocaleString());
+  console.log(
+    req.method +
+      ' - ' +
+      req.baseUrl +
+      ' - ' +
+      req.url +
+      ' - ' +
+      today.toLocaleString()
+  );
   next();
 };
 

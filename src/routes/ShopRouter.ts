@@ -11,9 +11,13 @@ class ShopRouter {
 
     this.router
       .route('/:gameId')
-      .get(requestDetails, authenticateJWT, async (req: RequestWithUser, res: Response) => {
-        await itemController.findAll(req, res);
-      });
+      .get(
+        requestDetails,
+        authenticateJWT,
+        async (req: RequestWithUser, res: Response) => {
+          await itemController.findAll(req, res);
+        }
+      );
   }
 }
 

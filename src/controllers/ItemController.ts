@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 
+import { Game } from '../types/Game';
 import { CreateItemInput, Item } from '../types/Item';
 import { RequestWithUser } from '../types/Request';
 import { config } from '../utils/config';
 import { Requests } from '../utils/Request';
-import { Game } from '../types/Game';
 
 class ItemController {
   request;
@@ -36,9 +36,11 @@ class ItemController {
         return;
       }
 
-      const gameData = (await this.gameRequest.get(`/game/${gameId}?playerId=${playerId}`)) as Game;
+      const gameData = (await this.gameRequest.get(
+        `/game/${gameId}?playerId=${playerId}`
+      )) as Game;
 
-      const level: number = gameData.steps.length
+      const level: number = gameData.steps.length;
       if (isNaN(level)) {
         res.sendStatus(400);
         return;

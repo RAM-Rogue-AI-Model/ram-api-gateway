@@ -26,14 +26,16 @@ class GameController {
     this.itemRequest = new Requests(config.MS_ITEM_URL);
   }
 
-  getConsumables = async (consumablesIds : string[]) => {
-    const consumablesTmp:Item[] = []
-    for(const consumablesId of consumablesIds){
-      const data = (await this.itemRequest.get(`/item/${consumablesId}`)) as Item
-      consumablesTmp.push(data)
+  getConsumables = async (consumablesIds: string[]) => {
+    const consumablesTmp: Item[] = [];
+    for (const consumablesId of consumablesIds) {
+      const data = (await this.itemRequest.get(
+        `/item/${consumablesId}`
+      )) as Item;
+      consumablesTmp.push(data);
     }
-    return consumablesTmp
-  }
+    return consumablesTmp;
+  };
 
   async create(req: RequestWithUser, res: Response) {
     try {
@@ -57,14 +59,20 @@ class GameController {
         return;
       }
 
-      const data = (await this.request.get(`/game/${id}?playerId=${playerId}`)) as GameType;
-      const player = (await this.playerRequest.get(`/player/${playerId}`)) as PlayerType;
+      const data = (await this.request.get(
+        `/game/${id}?playerId=${playerId}`
+      )) as GameType;
+      const player = (await this.playerRequest.get(
+        `/player/${playerId}`
+      )) as PlayerType;
 
-      if(data.consumables){
-        const dataWithConsumable = {...data, consumables:await this.getConsumables(data.consumables)} as GameConsumablesType
-        res.json({game:dataWithConsumable, player:player}); 
-      }else res.json({game:data, player:player}); 
-
+      if (data.consumables) {
+        const dataWithConsumable = {
+          ...data,
+          consumables: await this.getConsumables(data.consumables),
+        } as GameConsumablesType;
+        res.json({ game: dataWithConsumable, player: player });
+      } else res.json({ game: data, player: player });
     } catch {
       res.sendStatus(500);
       return;
@@ -85,16 +93,17 @@ class GameController {
         return;
       }
 
-      if(force === "true"){
-        const battleRes = await this.battleRequest.get(`/battle/game/${id}`)
-        if(battleRes){
-          const data = battleRes as CreateBattleInputError
-          if(!data.error && data.id) await this.battleRequest.delete(`/battle/${data.id}`)
+      if (force === 'true') {
+        const battleRes = await this.battleRequest.get(`/battle/game/${id}`);
+        if (battleRes) {
+          const data = battleRes as CreateBattleInputError;
+          if (!data.error && data.id)
+            await this.battleRequest.delete(`/battle/${data.id}`);
         }
-        await this.request.delete(`/game/${id}?playerId=${playerId}`)
-        res.status(200).send({message:"Game deleted"})
-        return
-      }else{
+        await this.request.delete(`/game/${id}?playerId=${playerId}`);
+        res.status(200).send({ message: 'Game deleted' });
+        return;
+      } else {
         if (!pvQuery || !attackQuery || !speedQuery) {
           res.sendStatus(400);
           return;
@@ -106,32 +115,40 @@ class GameController {
           res.sendStatus(400);
           return;
         }
-        const player = await this.playerRequest.get(`/player/${playerId}`) as PlayerType | null;
-        if(!player){
+        const player = (await this.playerRequest.get(
+          `/player/${playerId}`
+        )) as PlayerType | null;
+        if (!player) {
           res.sendStatus(404);
           return;
         }
-        const game = await this.request.get(`/game/${id}?playerId=${playerId}`) as Game | null;
-        if(!game){
+        const game = (await this.request.get(
+          `/game/${id}?playerId=${playerId}`
+        )) as Game | null;
+        if (!game) {
           res.sendStatus(404);
           return;
         }
         const gameStepLength = game.steps.length - 1;
         if (pv + attack + speed > gameStepLength) {
-          res.status(400).send({message:"Points exceed the number of steps in the game"});
+          res
+            .status(400)
+            .send({ message: 'Points exceed the number of steps in the game' });
           return;
         }
-  
+
         player.pv += pv;
         player.attack += attack;
         player.speed += speed;
-  
-        await this.playerRequest.put(`/player/${playerId}`, JSON.stringify(player)) as PlayerType;
-        
-        await this.request.delete(`/game/${id}?playerId=${playerId}`)
-        res.status(200).send({message:"Game deleted"})
-      }
 
+        (await this.playerRequest.put(
+          `/player/${playerId}`,
+          JSON.stringify(player)
+        )) as PlayerType;
+
+        await this.request.delete(`/game/${id}?playerId=${playerId}`);
+        res.status(200).send({ message: 'Game deleted' });
+      }
     } catch {
       res.sendStatus(500);
       return;
@@ -212,15 +229,14 @@ class GameController {
           return;
         }
 
-        if(game.consumables && battle.effect){
-          const consumables = await this.getConsumables(game.consumables)
-          for(let i = 0; i < battle.effect.length; i++){
-            const effect = battle.effect[i]
-            const item = consumables.find(i => i.effect_id === effect.id)
-            if(item) consumables.splice(consumables.indexOf(item), 1)
+        if (game.consumables.length > 0 && battle.effect.length > 0) {
+          const consumables = await this.getConsumables(game.consumables);
+          for (const effect of battle.effect) {
+            const item = consumables.find((i) => i.effect_id === effect.id);
+            if (item) consumables.splice(consumables.indexOf(item), 1);
           }
 
-          game.consumables = consumables.map(c => c.id)
+          game.consumables = consumables.map((c) => c.id);
         }
 
         if (!battle.error) {
@@ -229,37 +245,41 @@ class GameController {
           }
           await this.battleRequest.delete(`/battle/${battle.id}`);
         }
-        game.pv = battle.pv
-        game.money += 20 * (1 + Math.floor(game.steps.length / 10))
-      }else if(incompleteStep.type === "SHOP"){
-        if(input.item_id){
-          const item = await this.itemRequest.get(`/item/${input.item_id}`) as Item | null;
-          if(!item){
+        game.pv = battle.pv;
+        game.money += 20 * (1 + Math.floor(game.steps.length / 10));
+      } else if (incompleteStep.type === 'SHOP') {
+        if (input.item_id) {
+          const item = (await this.itemRequest.get(
+            `/item/${input.item_id}`
+          )) as Item | null;
+          if (!item) {
             res.sendStatus(404);
             return;
           }
-          if(game.money < item.price){
-            res.status(400).send({message:"Not enough money"});
+          if (game.money < item.price) {
+            res.status(400).send({ message: 'Not enough money' });
             return;
           }
           game.money -= item.price;
           game.consumables.push(item.id);
         }
-      }else{
-        const player = await this.playerRequest.get(`/player/${input.player_id}`) as PlayerType | null;
-        if(!player){
+      } else {
+        const player = (await this.playerRequest.get(
+          `/player/${input.player_id}`
+        )) as PlayerType | null;
+        if (!player) {
           res.sendStatus(404);
           return;
         }
         game.pv = Math.min(game.pv + 20, player.pv);
       }
       game.completed = true;
-      const consumables = await this.getConsumables(game.consumables)
+      const consumables = await this.getConsumables(game.consumables);
       const data = (await this.request.patch(
         `/game/${id}`,
         JSON.stringify({ ...game, steps: undefined })
-      )) as Game
-      res.json({...data, consumables:consumables});
+      )) as Game;
+      res.json({ ...data, consumables: consumables });
     } catch {
       res.sendStatus(500);
       return;

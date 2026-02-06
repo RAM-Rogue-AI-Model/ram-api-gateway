@@ -29,9 +29,9 @@ export interface GameType {
 }
 
 export interface GameConsumablesType {
-  id:string,
-  pv:number,
-  playerId:string,
+  id: string;
+  pv: number;
+  playerId: string;
   consumables?: Item[];
   money?: number;
   ended?: boolean;
