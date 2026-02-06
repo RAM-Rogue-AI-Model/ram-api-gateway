@@ -11,7 +11,7 @@ class LoggerController {
 
   async getAll(req: Request, res: Response) {
     try {
-      const data = await this.request.get(`/log`);
+      const data = await this.request.get(`/logs`);
       res.json(data);
       return;
     } catch {
